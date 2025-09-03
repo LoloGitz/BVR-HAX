@@ -31,16 +31,16 @@
 #     classes[pick_class] = float(pick_grade)
 #     print("Your " + pick_class + " grade is now " + str(classes[pick_class]) + ".")
 
-list = [1]
-for i in range(10):
-    last = list[len(list) - 1]
-    list.append(last * 2)
+# list = [1]
+# for i in range(10):
+#     last = list[len(list) - 1]
+#     list.append(last * 2)
 
-print(list)
+# print(list)
 
-new_list = []
-for i, value in enumerate(list):
-    if value > 50:
-        new_list.append(value)
+# new_list = []
+# for i, value in enumerate(list):
+#     if value > 50:
+#         new_list.append(value)
 
-print(new_list)
+# print(new_list)
