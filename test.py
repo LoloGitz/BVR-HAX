@@ -21,12 +21,26 @@
 # else:
 #     print("F. You failed.")
 
-classes = {"math": 100, "english": 50, "history": 75, "art":150}
+# classes = {"math": 100, "english": 50, "history": 75, "art":150}
 
-pick_class = input("Pick a class.")
-pick_direction = input("Read, or write? (r/w)")
-print("Your " + pick_class + " grade is currently " + str(classes[pick_class]) + ".")
-if pick_direction == "w":
-    pick_grade = input("What do you want to change it to?")
-    classes[pick_class] = float(pick_grade)
-    print("Your " + pick_class + " grade is now " + str(classes[pick_class]) + ".")
+# pick_class = input("Pick a class.")
+# pick_direction = input("Read, or write? (r/w)")
+# print("Your " + pick_class + " grade is currently " + str(classes[pick_class]) + ".")
+# if pick_direction == "w":
+#     pick_grade = input("What do you want to change it to?")
+#     classes[pick_class] = float(pick_grade)
+#     print("Your " + pick_class + " grade is now " + str(classes[pick_class]) + ".")
+
+list = [1]
+for i in range(10):
+    last = list[len(list) - 1]
+    list.append(last * 2)
+
+print(list)
+
+new_list = []
+for i, value in enumerate(list):
+    if value > 50:
+        new_list.append(value)
+
+print(new_list)
