@@ -44,14 +44,15 @@ def generateNoise(x: int, y: int, iterations: int, batch: dict = None) -> dict:
     else:
         print(lowest, highest)
 
-        filter = 
+        filt = {}
 
         for y_i in range(y):
+            filt[y_i] = {}
             for x_i in range(x):
                 weight = result[y_i][x_i]
-                result[y_i][x_i] = (weight - lowest) / highest
+                filt[y_i][x_i] = (weight - lowest) / highest
 
-        return result
+        return filt
     
 
 noise = generateNoise(50, 10, 5)
