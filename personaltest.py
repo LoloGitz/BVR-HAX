@@ -1,13 +1,32 @@
 import random
 import math
-import copy
+import os
+import time
+
+load_iterations = 1
+load_size = 50
+
+tiles_loaded = 0
+tiles_to_load = load_size ** 2 * load_iterations
 
 random.seed()
 
+def clear_terminal():
+    if os.name == "nt": # windows
+        os.system("cls")
+    else: # other (macOS or linux)
+        os.system("clear")
+
+def updateLoading():
+    clear_terminal()
+
+    global tiles_to_load
+    global tiles_loaded    
+    tiles_loaded += 1
+    print("loading map... " + str(tiles_loaded / tiles_to_load * 1000) + "%")
+
 def generateNoise(x: int, y: int, iterations: int, batch: dict = None) -> dict:
     result = {}
-
-    # print(batch)
 
     lowest = 1
     highest = 0
@@ -16,6 +35,7 @@ def generateNoise(x: int, y: int, iterations: int, batch: dict = None) -> dict:
         result[y_i] = {}
         for x_i in range(x):
             weight = 0
+
             if (batch == None):
                 weight = random.uniform(0, 1)
             else:
@@ -37,25 +57,22 @@ def generateNoise(x: int, y: int, iterations: int, batch: dict = None) -> dict:
             lowest = min(lowest, weight)
             highest = max(highest, weight)
             result[y_i][x_i] = weight
+            updateLoading()
                     
     if (iterations > 1):
-        print(iterations)
-        return generateNoise(x, y, iterations - 1, result.copy())
+        return generateNoise(x, y, iterations - 1, result)
     else:
-        print(lowest, highest)
-
         filt = {}
 
         for y_i in range(y):
             filt[y_i] = {}
             for x_i in range(x):
                 weight = result[y_i][x_i]
-                filt[y_i][x_i] = (weight - lowest) / highest
+                filt[y_i][x_i] = (weight - lowest) / (highest - lowest)
 
         return filt
     
-
-noise = generateNoise(50, 10, 5)
+noise = generateNoise(load_size, load_size, load_iterations)
 
 # for y in noise:
 #     y_values = noise[y]
@@ -68,12 +85,10 @@ for y in noise:
     print()
     for x in y_values:
         weight = y_values[x]
-        if(weight >= 0.6):
+        if(weight >= 0.7):
             print('🟩',end='')
-        elif (weight >= 0.5):
+        elif (weight >= 0.55):
             print('🟨',end='')
-        elif (weight >= 0.4):
-            print('💠',end='')
         else:
             print('🟦',end='')
         
