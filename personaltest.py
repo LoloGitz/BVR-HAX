@@ -2,20 +2,30 @@ import random
 import math
 import os
 import time
+import asyncio
+
+pip install keyboard
+import keyboard
 
 load_iterations = 4
-load_size = 50
+load_x = 10
+load_y = 10
+camera_range_x = 21
+camera_range_y = 20
 
 tiles_loaded = 0
-tiles_to_load = load_size ** 2 * load_iterations
+tiles_to_load = load_x * load_y * load_iterations
 
 random.seed()
 
-def clear_terminal():
-    if os.name == "nt": # windows
-        os.system("cls")
-    else: # other (macOS or linux)
-        os.system("clear")
+def update_terminal(message: str = None) -> None:
+    if os.name == 'nt':  # If the operating system is Windows
+        os.system('cls')
+    else:  # If the operating system is macOS or Linux
+        os.system('clear')
+    
+    if (message != None):
+        print(message)
 
 def updateLoading():
     global tiles_loaded
@@ -24,8 +34,7 @@ def updateLoading():
     ratio = round(tiles_loaded / tiles_to_load * 100) / 100
     ratio_bar = math.floor(ratio * 10)  
 
-    clear_terminal()
-    print(
+    update_terminal(
         "loading map... " 
         + str(round(ratio * 100))
         + "%\n-[ " + ("■" * ratio_bar)
@@ -33,6 +42,7 @@ def updateLoading():
         + " ]-"
     )
     
+#update_terminal()
 
 def generateNoise(x: int, y: int, iterations: int, batch: dict = None) -> dict:
     global tiles_loaded
@@ -81,28 +91,51 @@ def generateNoise(x: int, y: int, iterations: int, batch: dict = None) -> dict:
         return filt
     
 tick = time.time()
-noise = generateNoise(load_size, load_size, load_iterations)
-print(time.time() - tick)
+noise = generateNoise(load_x, load_y, load_iterations)
+print("loadtime: " + str(time.time() - tick))
 
-# for y in noise:
-#     y_values = noise[y]
-#     for x in y_values:
-#         weight = y_values[x]
-#         print(x, y, weight) -- debug
+time.sleep(1)
 
-while True:
-    clear_terminal()
+camera_pos_x = round(load_x / 2)
+camera_pos_y = round(load_y / 2)
 
-    for y in noise:
-        y_values = noise[y]
-        print()
-        for x in y_values:
-            weight = y_values[x]
-            if(weight >= 0.7):
-                print('🟩',end='')
-            elif (weight >= 0.55):
-                print('🟨',end='')
-            else:
-                print('🟦',end='')
+async def display():
+    try:
+        while True: 
+            display = ""
 
-        print('',end='\r')
+            if keyboard.is_pressed("w"):
+                camera_pos_x += 1
+
+            for cam_iy in range(camera_range_y):
+                for cam_ix in range(camera_range_x):
+                    xx = camera_pos_x + (cam_ix % camera_range_x) - math.floor(camera_range_x / 2)
+                    yy = camera_pos_y + cam_iy - math.floor(camera_range_y / 2)
+
+                    if (xx >= 0 and xx <= (load_x - 1) and yy >= 0 and yy <= (load_y - 1)):
+                        weight = noise[yy][xx]
+                    else:
+                        weight = -1
+
+                    if (weight == -1):
+                        display += "⬛"
+                    elif (weight >= 0.7):
+                        display += "🟩"
+                    elif (weight >= 0.55):
+                        display += "🟨"
+                    else:
+                        display += "🟦"
+                    
+                display += "\n"
+                
+            
+            update_terminal(display)
+            await asyncio.sleep(1/30)
+
+    except asyncio.CancelledError:
+        print("cancelled!")
+
+    finally:
+        print("finished!")
+
+asyncio.run(display())
